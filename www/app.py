@@ -9,6 +9,9 @@ tx_gpio = 23
 on_code = 5768088
 off_code = 5768084
 
+rfdevice = RFDevice(tx_gpio)
+rfdevice.enable_tx()
+
 
 @app.route('/')
 def index():
@@ -20,11 +23,7 @@ def light():
     on = state == 'true'
     code = on_code if on else off_code
     print('Turning ' + ('on' if on else 'off') + '...' )
-
-    rfdevice = RFDevice(tx_gpio)
-    rfdevice.enable_tx()
     rfdevice.tx_code(code, protocol, pulselength)
-    rfdevice.cleanup()
 
     return render_template('index.html')
 
