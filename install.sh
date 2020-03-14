@@ -2,4 +2,4 @@
 
 python3 -m venv py-env
 source py-env/bin/activate
-python www/app.py
+pip install -r requirements.txt
