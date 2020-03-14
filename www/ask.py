@@ -1,7 +1,7 @@
 import logging
 import os
 
-from flask import Flask
+from flask import Flask, request, render_template
 from flask_ask import Ask, request, session, question, statement
 import RPi.GPIO as GPIO
 from rpi_rf import RFDevice
@@ -51,6 +51,20 @@ def help():
 @ask.session_ended
 def session_ended():
     return "{}", 200
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/light')
+def light():
+    state = request.args.get('state')
+    on = state == 'true'
+    code = on_code if on else off_code
+    print('Turning ' + ('on' if on else 'off') + '...' )
+    rfdevice.tx_code(code, protocol, pulselength)
+
+    return render_template('index.html')
 
 
 if __name__ == '__main__':
