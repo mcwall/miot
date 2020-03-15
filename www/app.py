@@ -10,12 +10,14 @@ app = Flask(__name__)
 ask = Ask(app, "/")
 logging.getLogger('flask_ask').setLevel(logging.DEBUG)
 
-repeat_attempts = 2
-pulselength = 355
-protocol = 1
 tx_gpio = 23
-on_code = 5768088
-off_code = 5768084
+n_repeat = 1
+
+n_devices = 2
+protocols = [1, 1]
+pulselengths = [355, 363]
+on_codes = [5768088, 9986913]
+off_codes = [5768084, 9986914]
 
 STATUSON = ['on']
 STATUSOFF = ['off']
@@ -35,10 +37,10 @@ def launch():
 def Gpio_Intent(status,room):
     # We should do multiple attempts here to mitigate chance of RF interference
     if status in STATUSON:
-	    rfdevice.tx_code(on_code, protocol, pulselength)
+	    toggle(True)
 	    return statement('turning {} lights'.format(status))
     elif status in STATUSOFF:
-        rfdevice.tx_code(off_code, protocol, pulselength)
+        toggle(False)
         return statement('turning {} lights'.format(status))
     else:
         return statement('Sorry not possible.')
@@ -58,18 +60,19 @@ def index():
     return render_template('index.html')
 
 # Send signal a few times for robustness
-def send_sigal(code, protocol, pulselength):
-    for i in range(repeat_attempts):
-        rfdevice.tx_code(code, protocol, pulselength)
+def toggle(state):
+    codes = on_codes if state else off_codes
+    for _ in range(n_repeat):
+        for i in range(n_devices):
+            rfdevice.tx_code(codes[i], protocols[i], pulselengths[i])
 
 
 @app.route('/ui/light')
 def light():
     state = request.args.get('state')
     on = state == 'true'
-    code = on_code if on else off_code
     print('Turning ' + ('on' if on else 'off') + '...' )
-    send_sigal(code, protocol, pulselength)
+    toggle(on)
 
     return render_template('index.html')
 

@@ -1,3 +1,4 @@
+cryptography<2.2
 werkzeug==0.16.0
 flask_ask
 pigpio
