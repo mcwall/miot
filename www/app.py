@@ -7,17 +7,17 @@ import RPi.GPIO as GPIO
 from rpi_rf import RFDevice
 
 app = Flask(__name__)
-ask = Ask(app, "/")
+ask = Ask(app, "/ask")
 logging.getLogger('flask_ask').setLevel(logging.DEBUG)
 
 tx_gpio = 23
 n_repeat = 1
 
-n_devices = 2
-protocols = [1, 1]
-pulselengths = [355, 363]
-on_codes = [5768088, 9986913]
-off_codes = [5768084, 9986914]
+n_devices = 1
+protocols = [1]
+pulselengths = [355]
+on_codes = [5768088]
+off_codes = [5768084]
 
 STATUSON = ['on']
 STATUSOFF = ['off']
@@ -35,6 +35,7 @@ def launch():
 
 @ask.intent('GpioIntent', mapping = {'status':'status'})
 def Gpio_Intent(status,room):
+    print("GOT INTENT CALL!!!")
     # We should do multiple attempts here to mitigate chance of RF interference
     if status in STATUSON:
 	    toggle(True)
@@ -78,8 +79,10 @@ def light():
 
 
 if __name__ == '__main__':
+    app.config['ASK_VERIFY_REQUESTS'] = False
     if 'ASK_VERIFY_REQUESTS' in os.environ:
         verify = str(os.environ.get('ASK_VERIFY_REQUESTS', '')).lower()
         if verify == 'false':
             app.config['ASK_VERIFY_REQUESTS'] = False
+    #app.run(debug=True, host='0.0.0.0', ssl_context=('../ssl/cert.pem', '../ssl/key.pem'))
     app.run(debug=True, host='0.0.0.0')
