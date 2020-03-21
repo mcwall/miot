@@ -10,7 +10,7 @@ app = Flask(__name__)
 ask = Ask(app, "/ask")
 logging.getLogger('flask_ask').setLevel(logging.DEBUG)
 
-tx_gpio = 23
+tx_gpio = 17
 n_repeat = 1
 
 n_devices = 1
